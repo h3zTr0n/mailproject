@@ -200,14 +200,14 @@ def decodeToUnicode(messageBytes, fetchEncoding=fetchEncoding):
 
                     # toDelete = list(range(1, length(msgList)) and (delnum not in toDelete)):
             # mail
-        elif command[0] == 'm': # send a new mail via SMTP
-            sendmessage()
-            #execfile('smtpmail.py', {})    # alt: run file in own namespace
-        elif command[0] == '?':
-            print(helptext)
-        else:
-            print('what? -- type "?" for command help')
-    return toDelete
+            elif command[0] == 'm':     #send a new mail via SMTP
+                sendmessage()
+                #execfile('smtpmail.py', {})    # alt: run file in own namespace
+            elif command[0] == '?':
+                print(helptext)
+            else:
+                print('what? -- type "?" for command help')
+        return toDelete
 
 if __name__=="__main__":
     import getpass
