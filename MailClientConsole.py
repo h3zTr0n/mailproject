@@ -1,7 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 # Author: Alison Mukoma
 # Proffessional: Proffessional Software Programming and Security Engineering
 # Email: alisonmuko@metaCode.net
+# written: 3rd September 2015: From: 03Am...
 """
 ##############################################
 PyMail: A simple console based email client interface in python; It uses
@@ -45,7 +46,7 @@ def decodeToUnicode(messageBytes, fetchEncoding=fetchEncoding):
             text += line
         return From, To, Subj, text
 
-    def senfmessage():
+    def sendmessage():
         From, To, Subj, text = inputMessage()
         msg = Message()
         msg['From'] = From
@@ -127,4 +128,97 @@ def decodeToUnicode(messageBytes, fetchEncoding=fetchEncoding):
         else:
             print('Bad message number')
 
-        
+
+    def msgnum(command):
+        try:
+            return int(command.split()[1])
+        except:
+            return -1 # assume this is Bad
+
+    helptext = """
+    Available commands:
+    i    - index display
+    l n? - list all messages (or just message n)
+    d n? - mark all messages for deletion (or just message n)
+    s n? - save all messages to a file (or just message n)
+    m
+    - compose and send a new mail message
+    q
+    - quit pymail
+    ?
+    - display this help text
+
+    """
+
+    def interact(msgList, mailfile):
+        showindex(msgList)
+        toDelete = []
+        while True:
+            try:
+                command = input('[Pymail] Action? (i, l, d, s, m, q, ?)')
+            except EOFError:
+                command = 'q'
+            if not command:
+                command = '*'
+
+            # quit
+            if command == 'q':
+                break
+
+            # index
+            elif command[0] == 'i':
+                showu=index(msgList)
+
+            # list
+            elif command[0] == 'l':
+                if len(commad) == 1:
+                    for i in range(1, len(msgList)+1):
+                        showmessage(i, msgList)
+                else:
+                    showmessage(msgnum(command), msgList)
+
+            # save
+            elif command[0] == 's':
+                if len(command) == 1:
+                    for i in range(1, len(msgList)+1):
+                        savemessage(i, mailfile, msgList)
+                else:
+                    savemessage(msgnum(command), mailfile, msgList)
+
+            # delete
+            elif command[0] == 'd':
+                if len(command) == 1:   # delete all later
+                    toDelete = list(range1, len(msgList)+1) # 3.x requires list
+                else:
+                    delnum = msgnum(command)
+                    if(1 <= len(msgList)) and (delnum not in toDelete):
+                        toDelete.append(delnum)
+                    else:
+                        print('Bad message number')
+
+
+
+                    # toDelete = list(range(1, length(msgList)) and (delnum not in toDelete)):
+            # mail
+        elif command[0] == 'm': # send a new mail via SMTP
+            sendmessage()
+            #execfile('smtpmail.py', {})    # alt: run file in own namespace
+        elif command[0] == '?':
+            print(helptext)
+        else:
+            print('what? -- type "?" for command help')
+    return toDelete
+
+if __name__=="__main__":
+    import getpass
+    import mailconfig
+    mailserver = mailconfig.popservername   # ex: 'pop.rmi.net'
+    mailuser = mailconfig.popusername   # ex: 'Alison'
+    mailfile = mailconfig.savemailfile  # ex: r'c:\stuffsavemail'
+    mailpswd = getpass.getpass('Password for %s?' % mailserver)
+    print(['Pymail emailclient'])
+    msgList = loadmessages(mailserver, mailuser, mailpaswd) # load all
+    toDelete   = interact(msgList, mailfile)
+    if toDelete:
+        deleteMessages(mailserver, mailuser, mailpswd, toDelete)
+    print("BYE.")
