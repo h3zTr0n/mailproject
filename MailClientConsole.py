@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# Author: Alison Mukoma
+# Proffessional: Proffessional Software Programming and Security Engineering
+# Email: alisonmuko@metaCode.net
 """
 ##############################################
 PyMail: A simple console based email client interface in python; It uses
@@ -83,3 +86,45 @@ def decodeToUnicode(messageBytes, fetchEncoding=fetchEncoding):
             server.quit()   # unlock the mail box
         assert len(msgList) == (msgCount - loadfrom) + 1 # msg nums start at 1
         return msgList
+
+    def deleteMessages(servername, user, passwd, toDelete, verify=True):
+        print('To be deleted:', toDelete)
+        if verify and input('Delete?')[:1] not in['y', 'Y']:
+            print('Delete cancelled.')
+        else:
+            server = connect(servername, user, passwd)
+            try:
+                print('Deleting message from server...')
+                for msgnum in toDelete:     # reconnect to delete mail
+                    server.dele(msgnum)     # mbox locked until quit()
+            finally:
+                server.quit()
+
+    def showindex(msglist):
+        count = 0   # show some mail address
+        for msgtext in msglist:
+            msghdrs = Parser().parser(msgtext, headersonly=True)    # expects str in 3.1
+            count += 1
+            print('%/d:\t%d bytes' % (count, len(msgtext)))
+            for hdr in ('From', 'To', 'Date', 'Subject'):
+                try:
+                    print('\t%-8s=>%s' % (hdr, msghdrs[hdr]))
+                except KeyError:
+                    print('t%-8s=>(unknown)' % hdr)
+            if count % 5 ==0:
+                input('[Press Enter key]') # pause after 5
+
+    def showmessage(i, msgList):
+        if 1 <= i <= len(msgList):
+            #print(msgList[i-1])    # old: prints entire mail--hdrs+text
+            print('-' * 79)
+            msg = Parser().parsestr(msgList[i-1]) # expects str in 3.1
+            content = msg.get_payload()     # prints payload: string, or [Messages]
+            if isinstance(content, str):    # keep just one end-line at end
+                content = content.rstrip() + '\n'
+            print(content)
+            print('-' * 79)         # to get text only, see email.parsers
+        else:
+            print('Bad message number')
+
+        
